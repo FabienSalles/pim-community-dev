@@ -6,6 +6,7 @@
 - API-443: Prevent getting asset via media file url of the API
 - PIM-6996: Associate products to product models during import using the `<assocType>-product_models` pattern in an new column
 - PIM-6342: Display and remove associations gallery view
+- PIM-7046: Add ability to customise empty grid message and illustration
 
 ## Update jobs
 
