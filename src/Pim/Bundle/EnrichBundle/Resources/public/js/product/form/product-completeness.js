@@ -11,6 +11,7 @@ define(
     [
         'underscore',
         'oro/translator',
+        'pim/router',
         'pim/form',
         'pim/user-context',
         'pim/template/product/form/product-completeness'
@@ -18,6 +19,7 @@ define(
     function (
         _,
         __,
+        router,
         BaseForm,
         UserContext,
         template
@@ -151,6 +153,29 @@ define(
                         context: 'base_product'
                     }
                 );
+
+                const product = this.getFormData();
+                const familyVariant = product.meta.family_variant;
+
+                if (null !== familyVariant) {
+                    const comesFromParent = product.meta.parent_attributes.includes(
+                        event.currentTarget.dataset.attribute
+                    );
+
+                    if (comesFromParent) {
+                        let modelId = product.meta.variant_navigation[0].selected.id;
+                        const hasTwoLevelsOfVariation = (3 === product.meta.variant_navigation.length);
+
+                        if (hasTwoLevelsOfVariation) {
+                            modelId = product.meta.variant_navigation[1].selected.id;
+                        }
+
+                        this.redirectToModel(modelId);
+
+                        return;
+                    }
+                }
+
                 this.getRoot().trigger(
                     'pim_enrich:form:show_attribute',
                     {
@@ -160,6 +185,15 @@ define(
                     }
                 );
                 this.render();
+            },
+
+            redirectToModel: function(modelId) {
+                const params = {id: modelId};
+                const route = 'pim_enrich_product_model_edit';
+
+                sessionStorage.setItem('filter_missing_required_attributes', true);
+
+                router.redirectToRoute(route, params);
             }
         });
     }

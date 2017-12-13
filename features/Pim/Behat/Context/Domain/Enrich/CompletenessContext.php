@@ -3,6 +3,7 @@
 namespace Pim\Behat\Context\Domain\Enrich;
 
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Context\Spin\SpinCapableTrait;
 use Context\Spin\SpinException;
@@ -91,11 +92,30 @@ class CompletenessContext extends PimContext
      *
      * @throws ExpectationException
      */
-    public function iShouldSeeTheCompleteness(TableNode $table)
+    public function iShouldSeeTheCompletenessInThePanel(TableNode $table)
+    {
+        $completeness = $this->getElementOnCurrentPage('Completeness');
+
+        $this->iShouldSeeTheCompleteness($completeness, $table);
+    }
+
+    /**
+     * @param TableNode $table
+     *
+     * @Then /^I should see the completeness in the dropdown:$/
+     *
+     * @throws ExpectationException
+     */
+    public function iShouldSeeTheCompletenessInTheDropdown(TableNode $table)
+    {
+        $completeness = $this->getElementOnCurrentPage('Completeness dropdown');
+
+        $this->iShouldSeeTheCompleteness($completeness, $table);
+    }
+
+    private function iShouldSeeTheCompleteness($completeness, TableNode $table)
     {
         $table = $table->getHash();
-
-        $completeness = $this->getElementOnCurrentPage('Completeness');
 
         $this->spin(function () use ($table, $completeness) {
             $completenessData = $this->convertStructuredToFlat($completeness->getCompletenessData());
