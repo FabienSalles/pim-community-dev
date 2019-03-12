@@ -8,12 +8,14 @@
 define([
     'jquery',
     'underscore',
+    'oro/translator',
     'pim/form/common/fields/field',
     'pim/template/form/common/fields/text'
 ],
 function (
     $,
     _,
+    __,
     BaseField,
     template
 ) {
@@ -34,7 +36,8 @@ function (
          */
         renderInput: function (templateContext) {
             return this.template(_.extend(templateContext, {
-                value: this.getModelValue()
+                value: this.getModelValue(),
+                placeholder: __(this.config.placeholder)
             }));
         },
 
