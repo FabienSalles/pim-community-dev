@@ -23,6 +23,38 @@ extensions:
         targetZone: secondary-actions
         position: 110
 
+    pim-grid-view-create-label:
+        module: pim/form/common/fields/text
+        parent: pim-grid-view-selector-create-view
+        targetZone: fields
+        config:
+            label: grid.view_selector.choose_label
+            fieldName: new-view-label
+            placeholder: 'grid.view_selector.placeholder'
+
+    # type with select2
+    pim-grid-view-create-type:
+        module: pim/form/common/fields/select
+        parent: pim-grid-view-selector-create-view
+        targetZone: fields
+        config:
+            fieldName: new-view-type
+            label: grid.view_selector.choose_type
+            choices: [public, private]
+            required: true
+
+    # type with switch
+    #pim-grid-view-create-type:
+    #    module: pim/form/common/fields/boolean
+    #    parent: pim-grid-view-selector-create-view
+    #    targetZone: fields
+    #    config:
+    #        fieldName: new-view-type
+    #        label: grid.view_selector.choose_type
+    #        labels:
+    #            on: 'grid.view.type.public'
+    #            off: 'grid.view.type.private'
+
     pim-grid-view-selector-save-view:
         module: pim/grid/view-selector/save-view
         parent: pim-grid-view-selector-secondary-actions

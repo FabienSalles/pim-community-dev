@@ -64,35 +64,46 @@ define(
                 return this;
             },
 
+            renderModal: function() {
+                this.$el.html(this.templateModal({
+                    subTitleLabel: __('pim_datagrid.view_selector.view'),
+                    titleLabel: __('pim_datagrid.view_selector.create_view_modal.create'),
+                    picture: 'illustrations/Views.svg',
+                    fields: null
+                }));
+
+                this.renderExtensions();
+
+                // return this with setElement
+                return this.$el.html();
+            },
+
             /**
              * Prompt the view creation modal.
              */
             promptCreateView: function () {
                 this.getRoot().trigger('grid:view-selector:close-selector');
 
-                let modalContent = this.templateModal({
-                    subTitleLabel: __('pim_datagrid.view_selector.view'),
-                    titleLabel: __('pim_datagrid.view_selector.create_view_modal.create'),
-                    picture: 'illustrations/Views.svg',
-                    fields: this.templateInput({
-                        placeholder: __('grid.view_selector.placeholder'),
-                        label: __('grid.view_selector.choose_label')
-                    })
-                });
-
                 let modal = new Backbone.BootstrapModal({
-                    content: modalContent,
+                    content: this.renderModal(), // replace to '' with setElement
                     okText: __('pim_enrich.entity.create_popin.labels.save')
                 });
                 modal.open();
                 modal.$el.addClass('modal--fullPage');
 
-                const $submitButton = modal.$el.find('.ok').addClass('AknButton--disabled');
+                // this active the js but broke the modal and the view-selector
+                // this.renderModal();
+                //    .setElement(modal.$('.modal-body'))
+                //    .renderModal();
 
                 modal.on('ok', this.saveView.bind(this, modal));
                 modal.on('cancel', function () {
+                    this.render()
+                    //this.setElement($('[data-drop-zone="view-selector"]').find('[data-drop-zone="secondary-actions"]'))
+                    //    .getRoot().render();
                     modal.remove();
                 }.bind(this));
+
                 modal.$('input[name="new-view-label"]').on('input', function (event) {
                     var label = event.target.value;
 
@@ -107,6 +118,7 @@ define(
                         $submitButton.trigger('click');
                     }
                 });
+
             },
 
             /**
@@ -116,14 +128,7 @@ define(
              * @param {object} modal
              */
             saveView: function (modal) {
-                var gridState = DatagridState.get(this.getRoot().gridAlias, ['filters', 'columns']);
-                var newView = {
-                    filters: gridState.filters,
-                    columns: gridState.columns,
-                    label: modal.$('input[name="new-view-label"]').val()
-                };
-
-                DatagridViewSaver.save(newView, this.getRoot().gridAlias)
+                DatagridViewSaver.save(this.getDatagridViewData(), this.getRoot().gridAlias)
                     .done(function (response) {
                         this.getRoot().trigger('grid:view-selector:view-created', response.id);
                     }.bind(this))
@@ -132,6 +137,17 @@ define(
                             messenger.notify('error', error);
                         });
                     });
+            },
+
+            getDatagridViewData: function()
+            {
+                var gridState = DatagridState.get(this.getRoot().gridAlias, ['filters', 'columns']);
+
+                return {
+                    filters: gridState.filters,
+                    columns: gridState.columns,
+                    label: this.getExtension('pim-grid-view-create-label').getModelValue()
+                };
             }
         });
     }

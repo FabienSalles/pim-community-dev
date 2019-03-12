@@ -51,9 +51,15 @@ class DatagridViewRepository extends EntityRepository implements DatagridViewRep
         $options += ['limit' => 20, 'page' => 1];
         $offset = (int) $options['limit'] * ((int) $options['page'] - 1);
 
-        $qb = $this->createQueryBuilder('v')
-            ->where('v.type = :type')
-                ->setParameter('type', DatagridView::TYPE_PUBLIC)
+        $qb = $this->createQueryBuilder('v');
+
+        $qb->andWhere(
+            $qb->expr()->orX(
+                $qb->expr()->eq('v.type',  ':type'),
+                $qb->expr()->eq('v.owner', ':user')
+            ))
+            ->setParameter('type', DatagridView::TYPE_PUBLIC)
+            ->setParameter('user', $user)
             ->andWhere('v.datagridAlias = :alias')
                 ->setParameter('alias', $alias)
             ->andWhere('v.label LIKE :term')
